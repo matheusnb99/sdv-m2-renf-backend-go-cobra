@@ -44,7 +44,7 @@ func CreateMatch(HomeTeamID uint, AwayTeamID uint, MatchDate string) string {
 
 
 
-func GetMatchs() []models.Match {
+func GetMatches() []models.Match {
 	var matchs []models.Match
 	result := initializers.DB.Find(&matchs)
 
@@ -119,15 +119,35 @@ func GetMatchDetails(matchId uint) (MatchDetail, error) {
 
 }
 
-func GetMatchWithTeams(matchId uint) (models.Match, error) {
+func GetMatchWithTeams() ([]MatchDetail, error) {
+	// GetMatches and loop with GetMatchDetails
+	matches := GetMatches()
+	
+	var matchDetailsList []MatchDetail
+
+	for _, match := range matches {
+		matchDetails, err := GetMatchDetails(match.ID)
+		if err != nil {
+			panic("error fetching match details")
+		}
+		matchDetailsList = append(matchDetailsList, matchDetails)
+	}
+	return matchDetailsList, nil
+
+}
+
+
+func MatchDetailToString(match MatchDetail) string {
+	return fmt.Sprintf("id: %d, %s, %s, win: %t, matchDate: %s", match.ID, match.ScoreTeamAway, match.ScoreTeamLocal, match.Win, match.MatchDate)
+}
+
+func DeleteMatch(matchId uint) string {
 	var match models.Match
-	result := initializers.DB.Preload("HomeTeam").Preload("AwayTeam").First(&match, matchId)
+	result := initializers.DB.Delete(&match, matchId)
 
 	if result.Error != nil {
-		return match, result.Error
+		panic("error deleting match")
 	}
 
-	fmt.Println(match.HomeTeam.Name)
-	return match, nil
-
+	return "Match deleted successfully"
 }

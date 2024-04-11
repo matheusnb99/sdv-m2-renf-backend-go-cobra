@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/matheusnb99/sdv-m2-renf-backend-go-cobra/initializers"
 	"github.com/matheusnb99/sdv-m2-renf-backend-go-cobra/models"
+	"gorm.io/gorm"
 )
 
 func CreateTeam(Name string, Sport string) string {
@@ -63,28 +67,48 @@ func GetTeamNames() []string {
 }
 
 
-func DeleteTeam(Name string) string {
-	if Name == "" {
-		panic("Name is required")
-	}
+func DeleteTeam(Name string) (string, error) {
+if Name == "" {
+	return "", errors.New("name is required")
+}
 
-	tx := initializers.DB.Begin()
+tx := initializers.DB.Begin()
+
+var team models.Team
+if err := tx.First(&team, "name = ?", Name).Error; err != nil {
+	tx.Rollback()
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return "Team not found", nil
+	}
+	return "", fmt.Errorf("error finding team: %w", err)
+}
+
+    if err := tx.Delete(&team).Error; err != nil {
+        tx.Rollback()
+        return "", fmt.Errorf("error deleting team: %w", err)
+    }
+
+    if err := tx.Commit().Error; err != nil {
+        tx.Rollback()
+        return "", fmt.Errorf("error committing transaction: %w", err)
+    }
+
+    return "Team deleted successfully", nil
+}
+
+
+func GetIdByName(Name string) (uint, error) {
+	if Name == "" {
+		return 0, errors.New("name is required")
+	}
 
 	var team models.Team
-	if err := tx.First(&team, "name = ?", Name).Error; err != nil {
-		tx.Rollback()
-		panic("team not found")
+	if err := initializers.DB.First(&team, "name = ?", Name).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, nil
+		}
+		return 0, fmt.Errorf("error finding team: %w", err)
 	}
 
-	if err := tx.Delete(&team).Error; err != nil {
-		tx.Rollback()
-		panic("error deleting team")
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback()
-		panic("error committing transaction")
-	}
-
-	return "Team deleted successfully"
+	return team.ID, nil
 }

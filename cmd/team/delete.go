@@ -13,7 +13,7 @@ import (
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "A brief description of your command",
+	Short: "Deletes a team by name",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		name, err := cmd.Flags().GetString("name")
@@ -22,7 +22,6 @@ var deleteCmd = &cobra.Command{
 		}
 
 		controllers.DeleteTeam(name);
-		fmt.Println("with success!")
 	},
 }
 

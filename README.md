@@ -32,6 +32,30 @@ it will list the subcommands you can use (login, signup)
 
 ./tournoi-cli init
 
+## commands:
+
+auth login implementeded mais pas le temps de l'integrer
+init Initializes the database
+
+team  
+ create try -i command
+delete A brief description of your command
+list List the teams
+
+match  
+ create v
+delete v
+list v
+
+tournament
+create  
+ delete  
+ list
+
+sports
+create
+delete
+
 ## problems: go wont accept a package named tournament so I called it tournament\_
 
 # Front: cobra

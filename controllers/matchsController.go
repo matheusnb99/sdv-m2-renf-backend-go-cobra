@@ -76,7 +76,6 @@ func GetMatchesByName(teamName string) []MatchDetail {
 		panic("error fetching matchs")
 	}
 
-	// for match, call GetMatchDetails(match.ID)
 	var matchDetailsList []MatchDetail
 
 
@@ -94,10 +93,6 @@ func GetMatchesByName(teamName string) []MatchDetail {
 
 func GetMatchDetails(matchId uint) (MatchDetail, error) {
 	var match models.Match
-
-
-	// get the match with the given ID and join the teams table on the home_team_id and away_team_id
-
 	result := initializers.DB.Preload("HomeTeam").Preload("AwayTeam").First(&match, matchId).Where("matches.id = ?", matchId).First(&match)
 
 	if result.Error != nil {
@@ -105,8 +100,8 @@ func GetMatchDetails(matchId uint) (MatchDetail, error) {
 	}
 
 	win := match.WinnerID == match.HomeTeamID || match.WinnerID == match.AwayTeamID
-	ScoreTeamAway := match.AwayTeam.Name +" " +  strconv.Itoa(int(match.HomeTeamScore))
-	ScoreTeamLocal := strconv.Itoa(int(match.AwayTeamScore)) +" " + match.HomeTeam.Name
+	ScoreTeamAway := match.AwayTeam.Name +" " +  strconv.Itoa(int(match.AwayTeamScore))
+	ScoreTeamLocal := strconv.Itoa(int(match.HomeTeamScore)) +" " + match.HomeTeam.Name
 
 
 	return MatchDetail{
@@ -120,7 +115,6 @@ func GetMatchDetails(matchId uint) (MatchDetail, error) {
 }
 
 func GetMatchWithTeams() ([]MatchDetail, error) {
-	// GetMatches and loop with GetMatchDetails
 	matches := GetMatches()
 	
 	var matchDetailsList []MatchDetail
@@ -138,7 +132,7 @@ func GetMatchWithTeams() ([]MatchDetail, error) {
 
 
 func MatchDetailToString(match MatchDetail) string {
-	return fmt.Sprintf("id: %d, %s, %s, win: %t, matchDate: %s", match.ID, match.ScoreTeamAway, match.ScoreTeamLocal, match.Win, match.MatchDate)
+	return fmt.Sprintf("id: %d, %s, %s, win: %t, matchDate: %s", match.ID,  match.ScoreTeamLocal,match.ScoreTeamAway, match.Win, match.MatchDate)
 }
 
 func DeleteMatch(matchId uint) string {
@@ -150,4 +144,66 @@ func DeleteMatch(matchId uint) string {
 	}
 
 	return "Match deleted successfully"
+}
+
+
+
+func GetMatchTeamsNames(matchId uint) (string, string) {
+		var match models.Match
+		result := initializers.DB.Preload("HomeTeam").Preload("AwayTeam").First(&match, matchId).Where("matches.id = ?", matchId).First(&match)
+		
+		if result.Error != nil {
+			fmt.Println("error fetching match details")
+			return "", ""
+		}
+
+	return match.HomeTeam.Name, match.AwayTeam.Name
+}
+
+func ChangeScoreOfTeam(matchId uint, teamId uint, newScore uint) string {
+	var match models.Match
+	result := initializers.DB.First(&match, matchId)
+
+	if result.Error != nil {
+		panic("error fetching match")
+	}
+
+	if match.HomeTeamID == teamId {
+		match.HomeTeamScore = newScore
+	} else {
+		match.AwayTeamScore = newScore
+	}
+
+	result = initializers.DB.Save(&match)
+
+	if result.Error != nil {
+		panic("error updating match")
+	}
+
+	return "Match updated successfully"
+}
+
+func SetMatchOver(matchId uint) string {
+	var match models.Match
+	result := initializers.DB.First(&match, matchId)
+
+	if result.Error != nil {
+		panic("error fetching match")
+	}
+
+	// winner is the team with the highest score
+	if match.HomeTeamScore > match.AwayTeamScore {
+		match.WinnerID = match.HomeTeamID
+	} else {
+		match.WinnerID = match.AwayTeamID
+	}
+
+
+	result = initializers.DB.Save(&match)
+
+	if result.Error != nil {
+		panic("error updating match")
+	}
+
+	return "Match updated successfully"
 }

@@ -42,6 +42,8 @@ func createNewTeam() {
 	if err != nil {
 		panic("error getting id")
 	}
+
+	teams = utils.Filter(teams, home_team)
 	
 	away_team := utils.PromptGetSelect(utils.PromptContent{
 		ErrorMsg: "Sport cannot be empty",

@@ -10,7 +10,7 @@ import (
 // authCmd represents the auth command
 var AuthCmd = &cobra.Command{
 	Use:   "auth",
-	Short: "A brief description of your command",
+	Short: "Commands related to authentication",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()

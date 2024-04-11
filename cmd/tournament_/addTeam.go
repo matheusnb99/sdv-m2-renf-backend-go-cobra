@@ -12,7 +12,7 @@ import (
 // addTeamCmd represents the addTeam command
 var addTeamCmd = &cobra.Command{
 	Use:   "addTeam",
-	Short: "A brief description of your command",
+	Short: "Create a team",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("addTeam called")

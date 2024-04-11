@@ -10,7 +10,7 @@ import (
 // matchCmd represents the match command
 var MatchCmd = &cobra.Command{
 	Use:   "match",
-	Short: "A brief description of your command",
+	Short: "Commands related to match",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()

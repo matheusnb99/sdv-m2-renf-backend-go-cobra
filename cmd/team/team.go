@@ -10,7 +10,7 @@ import (
 // teamCmd represents the team command
 var TeamCmd = &cobra.Command{
 	Use:   "team",
-	Short: "A brief description of your command",
+	Short: "Commands related to team",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()

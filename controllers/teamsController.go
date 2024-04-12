@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/matheusnb99/sdv-m2-renf-backend-go-cobra/initializers"
 	"github.com/matheusnb99/sdv-m2-renf-backend-go-cobra/models"
@@ -20,24 +21,41 @@ func CreateTeam(Name string, Sport string) string {
 
 	tx := initializers.DB.Begin()
 
+	fmt.Printf("A \n\n")
 	var sport models.Sport
 	if err := tx.First(&sport, "name = ?", Sport).Error; err != nil {
-		sport = models.Sport{Name: Name}
-		if err := tx.Create(&sport).Error; err != nil {
+		// Check if the error is due to record not found
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Handle "record not found" error gracefully
+			// For example, you can create a new record here
+			sport = models.Sport{Name: Name}
+			if err := tx.Create(&sport).Error; err != nil {
+				tx.Rollback()
+				fmt.Printf("Prompt failed %v\n", err) // Print error for debugging purposes
+				os.Exit(1)
+			}
+		} else {
+			// Handle other errors
 			tx.Rollback()
-			panic("error creating sport")
+			os.Exit(1)
 		}
 	}
-
+	
+	
+	
+	
+	fmt.Printf("B \n\n")
 	team := models.Team{Name: Name, SportID: sport.ID}
 	if err := tx.Create(&team).Error; err != nil {
 		tx.Rollback()
-		panic("error creating team")
+		fmt.Printf("Prompt failed %v\n", err)
+		os.Exit(1)
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
-		panic("error committing transaction")
+		fmt.Printf("Prompt failed %v\n", err)
+		os.Exit(1)
 	}
 
 	return "Team created successfully"

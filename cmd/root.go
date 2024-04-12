@@ -16,17 +16,17 @@ import (
 
 
 func addSubCommandPalettes() {
-	rootCmd.AddCommand(auth.AuthCmd)
-	rootCmd.AddCommand(tournament_.TournamentCmd)
-	rootCmd.AddCommand(match.MatchCmd)
-	rootCmd.AddCommand(team.TeamCmd)
+	RootCmd.AddCommand(auth.AuthCmd)
+	RootCmd.AddCommand(tournament_.TournamentCmd)
+	RootCmd.AddCommand(match.MatchCmd)
+	RootCmd.AddCommand(team.TeamCmd)
 
 
 }
 
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
+// RootCmd represents the base command when called without any subcommands
+var RootCmd = &cobra.Command{
 	Use:   "sdv-m2-renf-backend-go-cobra",
 	Short: "This is a backend cli for the TourNament project, using Go and Cobra.",
 	Long: `This is a backend cli for the TourNament project, using Go and Cobra. 
@@ -40,14 +40,14 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	err := rootCmd.Execute()
+	err := RootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	addSubCommandPalettes()
 }
 
